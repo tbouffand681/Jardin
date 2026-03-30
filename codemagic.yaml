@@ -1,4 +1,4 @@
-orkflows:
+workflows:
   android-workflow:
     name: SemisJardin Android Build
     max_build_duration: 60
