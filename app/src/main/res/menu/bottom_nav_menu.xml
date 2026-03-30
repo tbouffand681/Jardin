@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:id="@+id/calendarFragment"
-        android:icon="@drawable/ic_calendar"
-        android:title="Calendrier" />
-
-    <item
-        android:id="@+id/libraryFragment"
-        android:icon="@drawable/ic_library"
-        android:title="Bibliothèque" />
-
-    <item
-        android:id="@+id/growthFragment"
-        android:icon="@drawable/ic_growth"
-        android:title="Météo" />
-
+    <item android:id="@+id/calendarFragment" android:icon="@drawable/ic_calendar" android:title="Calendrier" />
+    <item android:id="@+id/libraryFragment" android:icon="@drawable/ic_library" android:title="Bibliothèque" />
+    <item android:id="@+id/journalFragment" android:icon="@drawable/ic_journal" android:title="Journal" />
+    <item android:id="@+id/growthFragment" android:icon="@drawable/ic_growth" android:title="Météo" />
 </menu>
