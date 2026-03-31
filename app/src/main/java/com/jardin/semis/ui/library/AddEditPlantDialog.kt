@@ -85,14 +85,14 @@ class AddEditPlantDialog : BottomSheetDialogFragment() {
                 } else {
                     viewModel.addPlant(plant)
                 }
-                dismiss()
+                if (isAdded && !isStateSaved) dismissAllowingStateLoss()
             } catch (e: Exception) {
                 // Afficher l'erreur sans crasher
                 binding.tilName.error = "Erreur : ${e.message}"
             }
         }
 
-        binding.btnCancel.setOnClickListener { dismiss() }
+        binding.btnCancel.setOnClickListener { if (isAdded && !isStateSaved) dismissAllowingStateLoss() }
     }
 
     override fun onDestroyView() {

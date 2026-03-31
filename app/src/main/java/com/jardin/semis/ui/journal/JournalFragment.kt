@@ -154,10 +154,10 @@ class AddEventBottomSheet : BottomSheetDialogFragment() {
             )
 
             viewModel.addNaturalEvent(event)
-            dismiss()
+            if (isAdded && !isStateSaved) dismissAllowingStateLoss()
         }
 
-        binding.btnCancel.setOnClickListener { dismiss() }
+        binding.btnCancel.setOnClickListener { if (isAdded && !isStateSaved) dismissAllowingStateLoss() }
     }
 
     override fun onDestroyView() {

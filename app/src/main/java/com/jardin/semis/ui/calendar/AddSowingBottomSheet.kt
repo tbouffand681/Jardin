@@ -12,8 +12,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.jardin.semis.SemisViewModel
 import com.jardin.semis.data.model.Plant
 import com.jardin.semis.databinding.BottomSheetAddSowingBinding
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -35,7 +35,10 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
     private var plantList: List<Plant> = emptyList()
     private val displayFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.FRENCH)
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = BottomSheetAddSowingBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -45,10 +48,10 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
 
         binding.tvSelectedDate.text = selectedDate.format(displayFormatter)
 
-        // Charger les plantes une seule fois
+        // Charger les plantes une seule fois avec .first() — pas de collectLatest qui reste ouvert
         lifecycleScope.launch {
             try {
-                val plants = viewModel.allPlants.first()
+                val plants = viewModel.allPlants.first { it.isNotEmpty() }
                 plantList = plants
                 val names = plants.map { "${it.emoji} ${it.name}" }
                 val adapter = ArrayAdapter(
@@ -56,12 +59,14 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
                     android.R.layout.simple_dropdown_item_1line,
                     names
                 )
-                binding.spinnerPlant.setAdapter(adapter)
-                binding.spinnerPlant.setOnItemClickListener { _, _, position, _ ->
-                    if (position < plants.size) updateHarvestPreview(plants[position])
+                if (_binding != null) {
+                    binding.spinnerPlant.setAdapter(adapter)
+                    binding.spinnerPlant.setOnItemClickListener { _, _, position, _ ->
+                        if (position < plants.size) updateHarvestPreview(plants[position])
+                    }
                 }
             } catch (e: Exception) {
-                // liste vide en cas d'erreur
+                // Ignorer si le fragment est déjà détaché
             }
         }
 
@@ -79,7 +84,7 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
             val plant = plantList.firstOrNull { "${it.emoji} ${it.name}" == plantName }
 
             if (plant == null) {
-                binding.tilPlant.error = "Choisissez une plante"
+                binding.tilPlant.error = "Choisissez une plante dans la liste"
                 return@setOnClickListener
             }
             binding.tilPlant.error = null
@@ -88,14 +93,22 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
             val quantity = binding.etQuantity.text?.toString()?.toIntOrNull() ?: 1
             val notes = binding.etNotes.text?.toString()?.trim() ?: ""
 
+            // Lancer addSowing PUIS fermer — sans attendre le résultat pour éviter le crash
             viewModel.addSowing(plant.id, selectedDate, location, quantity, notes)
-            dismiss()
+
+            // Fermer seulement si le fragment est encore attaché
+            if (isAdded && !isStateSaved) {
+                dismissAllowingStateLoss()
+            }
         }
 
-        binding.btnCancel.setOnClickListener { dismiss() }
+        binding.btnCancel.setOnClickListener {
+            if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+        }
     }
 
     private fun updateHarvestPreview(plant: Plant? = null) {
+        if (_binding == null) return
         val p = plant ?: plantList.firstOrNull {
             "${it.emoji} ${it.name}" == binding.spinnerPlant.text?.toString()
         }
