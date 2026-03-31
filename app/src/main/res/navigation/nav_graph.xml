@@ -3,21 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
     app:startDestination="@id/calendarFragment">
-
     <fragment android:id="@+id/calendarFragment"
-        android:name="com.jardin.semis.ui.calendar.CalendarFragment"
-        android:label="Calendrier" />
-
+        android:name="com.jardin.semis.ui.calendar.CalendarFragment" android:label="Calendrier" />
     <fragment android:id="@+id/libraryFragment"
-        android:name="com.jardin.semis.ui.library.LibraryFragment"
-        android:label="Bibliothèque" />
-
-    <fragment android:id="@+id/growthFragment"
-        android:name="com.jardin.semis.ui.growth.GrowthFragment"
-        android:label="Météo" />
-
+        android:name="com.jardin.semis.ui.library.LibraryFragment" android:label="Bibliothèque" />
+    <fragment android:id="@+id/monthlyFragment"
+        android:name="com.jardin.semis.ui.monthly.MonthlyFragment" android:label="Semis du mois" />
     <fragment android:id="@+id/journalFragment"
-        android:name="com.jardin.semis.ui.journal.JournalFragment"
-        android:label="Journal" />
-
+        android:name="com.jardin.semis.ui.journal.JournalFragment" android:label="Journal" />
+    <fragment android:id="@+id/growthFragment"
+        android:name="com.jardin.semis.ui.growth.GrowthFragment" android:label="Météo" />
+    <fragment android:id="@+id/exportFragment"
+        android:name="com.jardin.semis.ui.export.ExportFragment" android:label="Export" />
 </navigation>

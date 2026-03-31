@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -42,25 +45,49 @@ class GrowthFragment : Fragment() {
         observeGrowthTimeline()
     }
 
-    private fun setupWeather() {
-        binding.cityInputLayout.visibility = View.VISIBLE
-        binding.btnFetchCityWeather.setOnClickListener {
-            val city = binding.etCity.text?.toString()?.trim() ?: ""
-            if (city.isNotEmpty()) {
-                viewModel.fetchWeatherByCity(city)
-                binding.cityInputLayout.visibility = View.GONE
-            }
+    private fun fetchWeather() {
+        val city = binding.etCity.text?.toString()?.trim() ?: ""
+        if (city.isEmpty()) {
+            binding.cityInputLayout.error = "Entrez le nom de votre ville"
+            return
         }
+        binding.cityInputLayout.error = null
+        // Masquer le clavier
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.etCity.windowToken, 0)
+        viewModel.fetchWeatherByCity(city)
+    }
+
+    private fun setupWeather() {
+        // Bouton toujours visible, clique dessus
+        binding.btnFetchCityWeather.setOnClickListener { fetchWeather() }
+
+        // Aussi déclencher sur la touche "Rechercher" du clavier
+        binding.etCity.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                fetchWeather()
+                true
+            } else false
+        }
+
+        // Bouton "Changer de ville" — réaffiche le champ
         binding.btnRefreshWeather.setOnClickListener {
+            binding.weatherCard.visibility = View.GONE
             binding.cityInputLayout.visibility = View.VISIBLE
+            binding.btnFetchCityWeather.visibility = View.VISIBLE
+            binding.etCity.requestFocus()
         }
     }
 
     private fun observeWeather() {
         viewModel.weatherData.observe(viewLifecycleOwner) { weather ->
             if (weather == null) return@observe
+            binding.weatherCard.visibility = View.VISIBLE
+            // Cacher le champ une fois la météo affichée
+            binding.cityInputLayout.visibility = View.GONE
+            binding.btnFetchCityWeather.visibility = View.GONE
+
             with(binding) {
-                weatherCard.visibility = View.VISIBLE
                 tvCity.text = "📍 ${weather.cityName}"
                 tvTemperature.text = "${weather.temperature.toInt()}°C"
                 tvDescription.text = weather.description
@@ -70,12 +97,14 @@ class GrowthFragment : Fragment() {
                 tvSowingAdvice.text = weather.sowingAdvice()
             }
         }
+
         viewModel.weatherLoading.observe(viewLifecycleOwner) { loading ->
             binding.weatherProgress.visibility = if (loading) View.VISIBLE else View.GONE
+            binding.btnFetchCityWeather.isEnabled = !loading
         }
+
         viewModel.weatherError.observe(viewLifecycleOwner) { error ->
             if (error != null) {
-                binding.cityInputLayout.visibility = View.VISIBLE
                 Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
             }
         }
@@ -98,8 +127,7 @@ class GrowthFragment : Fragment() {
 
                 val upcoming = sowings.filter {
                     try {
-                        val days = ChronoUnit.DAYS.between(today, LocalDate.parse(it.expectedHarvestDate, fmt))
-                        days in 0..30
+                        ChronoUnit.DAYS.between(today, LocalDate.parse(it.expectedHarvestDate, fmt)) in 0..30
                     } catch (e: Exception) { false }
                 }.sortedBy { it.expectedHarvestDate }
 
