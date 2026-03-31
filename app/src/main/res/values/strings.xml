@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SemisJardin</string>
+    <string name="tab_calendar">Calendrier</string>
+    <string name="tab_library">Bibliothèque</string>
+    <string name="tab_growth">Météo</string>
+    <string name="add_sowing">Nouveau semis</string>
+    <string name="save">Enregistrer</string>
+    <string name="cancel">Annuler</string>
+    <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
+    <string name="no_sowings">Aucun semis enregistré</string>
+    <string name="no_plants">Aucune plante trouvée</string>
+    <string name="weather_loading">Chargement de la météo…</string>
+</resources>

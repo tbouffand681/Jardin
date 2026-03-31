@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Emoji -->
+        <TextView
+            android:id="@+id/tv_emoji"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="40sp"
+            android:gravity="center"
+            android:text="🌱" />
+
+        <!-- Nom -->
+        <TextView
+            android:id="@+id/tv_plant_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+            android:gravity="center"
+            android:text="Tomate" />
+
+        <!-- Nom latin -->
+        <TextView
+            android:id="@+id/tv_latin_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+            android:gravity="center"
+            android:fontFamily="serif"
+            android:alpha="0.6"
+            android:text="Solanum lycopersicum" />
+
+        <!-- Catégorie chip -->
+        <TextView
+            android:id="@+id/tv_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_chip"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:textSize="10sp"
+            android:text="Légume fruit" />
+
+        <!-- Infos clés -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_occupation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:text="⏱ 150j" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" · "
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tv_sun_exposure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:text="☀️" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_water_needs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:text="💧💧 Moyen" />
+
+        <!-- Mois de semis -->
+        <TextView
+            android:id="@+id/tv_sowing_months"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:alpha="0.7"
+            android:text="📅 Mar Avr Mai" />
+
+        <!-- Bouton modifier -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_edit"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Modifier"
+            app:icon="@drawable/ic_edit" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

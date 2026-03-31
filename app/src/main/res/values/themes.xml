@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.SemisJardin" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryDark">@color/green_primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/green_light</item>
+        <item name="colorOnPrimaryContainer">@color/green_dark</item>
+        <item name="colorError">@color/error_color</item>
+        <item name="android:statusBarColor">@color/green_primary_dark</item>
+        <item name="android:navigationBarColor">@color/white</item>
+    </style>
+
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/calendarFragment">
+
+    <fragment android:id="@+id/calendarFragment"
+        android:name="com.jardin.semis.ui.calendar.CalendarFragment"
+        android:label="Calendrier" />
+
+    <fragment android:id="@+id/libraryFragment"
+        android:name="com.jardin.semis.ui.library.LibraryFragment"
+        android:label="Bibliothèque" />
+
+    <fragment android:id="@+id/growthFragment"
+        android:name="com.jardin.semis.ui.growth.GrowthFragment"
+        android:label="Météo" />
+
+    <fragment android:id="@+id/journalFragment"
+        android:name="com.jardin.semis.ui.journal.JournalFragment"
+        android:label="Journal" />
+
+</navigation>
