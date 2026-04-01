@@ -1,12 +1,12 @@
 package com.jardin.semis.ui.growth
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -27,8 +27,7 @@ class GrowthFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: SemisViewModel by lazy {
-        ViewModelProvider(
-            requireActivity(),
+        ViewModelProvider(requireActivity(),
             ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
         )[SemisViewModel::class.java]
     }
@@ -47,32 +46,21 @@ class GrowthFragment : Fragment() {
 
     private fun fetchWeather() {
         val city = binding.etCity.text?.toString()?.trim() ?: ""
-        if (city.isEmpty()) {
-            binding.cityInputLayout.error = "Entrez le nom de votre ville"
-            return
-        }
+        if (city.isEmpty()) { binding.cityInputLayout.error = "Entrez le nom de votre ville"; return }
         binding.cityInputLayout.error = null
-        // Masquer le clavier
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.etCity.windowToken, 0)
         viewModel.fetchWeatherByCity(city)
     }
 
     private fun setupWeather() {
-        // Bouton toujours visible, clique dessus
         binding.btnFetchCityWeather.setOnClickListener { fetchWeather() }
-
-        // Aussi déclencher sur la touche "Rechercher" du clavier
         binding.etCity.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                fetchWeather()
-                true
-            } else false
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) { fetchWeather(); true } else false
         }
-
-        // Bouton "Changer de ville" — réaffiche le champ
         binding.btnRefreshWeather.setOnClickListener {
             binding.weatherCard.visibility = View.GONE
+            binding.tvDataSource.visibility = View.GONE
             binding.cityInputLayout.visibility = View.VISIBLE
             binding.btnFetchCityWeather.visibility = View.VISIBLE
             binding.etCity.requestFocus()
@@ -83,28 +71,33 @@ class GrowthFragment : Fragment() {
         viewModel.weatherData.observe(viewLifecycleOwner) { weather ->
             if (weather == null) return@observe
             binding.weatherCard.visibility = View.VISIBLE
-            // Cacher le champ une fois la météo affichée
+            binding.tvDataSource.visibility = View.VISIBLE
             binding.cityInputLayout.visibility = View.GONE
             binding.btnFetchCityWeather.visibility = View.GONE
 
             with(binding) {
                 tvCity.text = "📍 ${weather.cityName}"
+                tvWeatherIcon.text = weather.icon
                 tvTemperature.text = "${weather.temperature.toInt()}°C"
                 tvDescription.text = weather.description
                 tvHumidity.text = "💧 ${weather.humidity}%"
-                tvWind.text = "💨 ${weather.windSpeed} m/s"
-                tvTempMinMax.text = "↓${weather.tempMin.toInt()}° / ↑${weather.tempMax.toInt()}°"
+                tvWind.text = "💨 ${String.format("%.0f", weather.windSpeed)} km/h"
+                tvTempMinMax.text = "↓${weather.tempMin.toInt()}° ↑${weather.tempMax.toInt()}°"
+                tvPrecipitation.text = "🌧️ ${String.format("%.1f", weather.precipitation)} mm"
+                tvEt0.text = "🌱 ET₀ ${String.format("%.1f", weather.evapotranspiration)} mm/j"
                 tvSowingAdvice.text = weather.sowingAdvice()
+                tvIrrigationAdvice.text = weather.irrigationAdvice()
             }
         }
 
         viewModel.weatherLoading.observe(viewLifecycleOwner) { loading ->
+            if (_binding == null) return@observe
             binding.weatherProgress.visibility = if (loading) View.VISIBLE else View.GONE
             binding.btnFetchCityWeather.isEnabled = !loading
         }
 
         viewModel.weatherError.observe(viewLifecycleOwner) { error ->
-            if (error != null) {
+            if (error != null && _binding != null) {
                 Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG).show()
             }
         }
@@ -117,18 +110,20 @@ class GrowthFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.activeSowings.collectLatest { sowings ->
+                if (_binding == null) return@collectLatest
                 if (sowings.isEmpty()) {
                     binding.emptyGrowth.visibility = View.VISIBLE
                     binding.growthContainer.visibility = View.GONE
+                    binding.tvUpcomingTitle.visibility = View.GONE
+                    binding.tvUpcomingHarvests.visibility = View.GONE
                     return@collectLatest
                 }
                 binding.emptyGrowth.visibility = View.GONE
                 binding.growthContainer.visibility = View.VISIBLE
 
                 val upcoming = sowings.filter {
-                    try {
-                        ChronoUnit.DAYS.between(today, LocalDate.parse(it.expectedHarvestDate, fmt)) in 0..30
-                    } catch (e: Exception) { false }
+                    try { ChronoUnit.DAYS.between(today, LocalDate.parse(it.expectedHarvestDate, fmt)) in 0..30 }
+                    catch (e: Exception) { false }
                 }.sortedBy { it.expectedHarvestDate }
 
                 if (upcoming.isNotEmpty()) {
@@ -146,15 +141,18 @@ class GrowthFragment : Fragment() {
 
                 val sowed = sowings.count { it.status == SowingStatus.SOWED }
                 val germinated = sowings.count { it.status == SowingStatus.GERMINATED }
+                val transplanted = sowings.count { it.status == SowingStatus.TRANSPLANTED }
                 val growing = sowings.count { it.status == SowingStatus.GROWING }
-                binding.tvStatsGrowth.text =
-                    "🌰 Semés : $sowed\n🌱 Levée : $germinated\n🌿 En croissance : $growing\nTotal actifs : ${sowings.size}"
+                binding.tvStatsGrowth.text = buildString {
+                    append("🌰 Semés : $sowed\n")
+                    append("🌱 Levée : $germinated\n")
+                    if (transplanted > 0) append("🪴 Repiqués : $transplanted\n")
+                    append("🌿 En croissance : $growing\n")
+                    append("Total actifs : ${sowings.size}")
+                }
             }
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

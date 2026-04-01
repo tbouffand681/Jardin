@@ -66,6 +66,7 @@ class SowingsTimelineAdapter(
                 tvStatus.text = when (sowing.status) {
                     SowingStatus.SOWED -> "🌰 Semé"
                     SowingStatus.GERMINATED -> "🌱 Levée"
+                    SowingStatus.TRANSPLANTED -> "🪴 Repiqué"
                     SowingStatus.GROWING -> "🌿 Croissance"
                     SowingStatus.HARVESTED -> "✅ Récolté"
                     SowingStatus.FAILED -> "❌ Échec"

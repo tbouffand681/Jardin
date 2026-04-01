@@ -1,7 +1,6 @@
 package com.jardin.semis.data.repository
 
 import android.content.Context
-import com.jardin.semis.BuildConfig
 import com.jardin.semis.data.db.*
 import com.jardin.semis.data.model.*
 import kotlinx.coroutines.flow.Flow
@@ -76,29 +75,8 @@ class SemisRepository(
 
     // ─── Météo ────────────────────────────────────────────────────────────────
 
-    suspend fun getWeatherByCity(city: String): Result<WeatherData> {
-        return try {
-            val response = WeatherApiClient.service.getCurrentWeatherByCity(
-                city = city,
-                apiKey = BuildConfig.WEATHER_API_KEY
-            )
-            Result.success(response.toWeatherData())
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    private fun com.jardin.semis.data.model.WeatherApiResponse.toWeatherData() = WeatherData(
-        cityName = name,
-        temperature = main.temp,
-        feelsLike = main.feels_like,
-        humidity = main.humidity,
-        description = weather.firstOrNull()?.description?.replaceFirstChar { it.uppercase() } ?: "",
-        icon = weather.firstOrNull()?.icon ?: "",
-        windSpeed = wind.speed,
-        tempMin = main.temp_min,
-        tempMax = main.temp_max
-    )
+    suspend fun getWeatherByCity(city: String): Result<WeatherData> =
+        WeatherApiClient.getWeatherByCity(city)
 
     // ─── Initialisation des plantes par défaut (une seule fois) ──────────────
 

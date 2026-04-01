@@ -11,7 +11,7 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="🌦️ Météo &amp; Croissance" />
+            app:title="🌦️ Météo agricole" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -19,142 +19,126 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
 
-            <!-- Saisie ville — TOUJOURS VISIBLE au départ -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Entrez votre ville pour obtenir la météo :"
+            <!-- Saisie ville -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp" android:text="📍 Votre ville"
                 android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/city_input_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_marginBottom="8dp">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_city"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:hint="Ex : Chambéry, Lyon, Paris..."
                     android:imeOptions="actionSearch"
                     android:inputType="textCapWords"
                     android:singleLine="true" />
-
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Bouton TOUJOURS VISIBLE -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_fetch_city_weather"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="🔍 Voir la météo"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" android:text="🔍 Voir la météo agricole"
                 app:cornerRadius="12dp" />
 
-            <!-- Loader météo -->
-            <ProgressBar
-                android:id="@+id/weather_progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone" />
+            <ProgressBar android:id="@+id/weather_progress"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_gravity="center" android:visibility="gone" />
 
-            <!-- Carte météo -->
+            <!-- Carte météo principale -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/weather_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone"
-                app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="@color/weather_card_bg"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" android:visibility="gone"
+                app:cardCornerRadius="20dp" app:cardBackgroundColor="@color/weather_card_bg"
                 app:cardElevation="4dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical" android:padding="20dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/tv_city"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:gravity="center_vertical">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:id="@+id/tv_city"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                                android:textColor="@android:color/white"
-                                android:text="Paris" />
-
-                            <TextView
-                                android:id="@+id/tv_description"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white" android:text="Ma ville" />
+                            <TextView android:id="@+id/tv_description"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
                                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.85"
-                                android:text="Partiellement nuageux" />
-
+                                android:textColor="@android:color/white" android:alpha="0.85" />
                         </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/tv_temperature"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="48sp"
-                            android:textColor="@android:color/white"
-                            android:textStyle="bold"
-                            android:text="18°C" />
-
+                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:orientation="vertical" android:gravity="center">
+                            <TextView android:id="@+id/tv_weather_icon"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:textSize="40sp" android:text="🌡️" />
+                            <TextView android:id="@+id/tv_temperature"
+                                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:textSize="36sp" android:textColor="@android:color/white"
+                                android:textStyle="bold" />
+                        </LinearLayout>
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp"
                         android:layout_marginVertical="12dp" android:background="#40FFFFFF" />
 
+                    <!-- Données météo ligne 1 -->
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal" android:layout_marginBottom="6dp">
                         <TextView android:id="@+id/tv_humidity" android:layout_width="0dp"
                             android:layout_height="wrap_content" android:layout_weight="1"
-                            android:textColor="@android:color/white" android:alpha="0.85"
-                            android:text="💧 65%" />
+                            android:textColor="@android:color/white" android:alpha="0.9" />
                         <TextView android:id="@+id/tv_wind" android:layout_width="0dp"
                             android:layout_height="wrap_content" android:layout_weight="1"
-                            android:textColor="@android:color/white" android:alpha="0.85"
-                            android:text="💨 12 m/s" />
+                            android:textColor="@android:color/white" android:alpha="0.9" />
                         <TextView android:id="@+id/tv_temp_min_max" android:layout_width="0dp"
                             android:layout_height="wrap_content" android:layout_weight="1"
-                            android:textColor="@android:color/white" android:alpha="0.85"
-                            android:gravity="end" android:text="↓14° / ↑22°" />
+                            android:textColor="@android:color/white" android:alpha="0.9"
+                            android:gravity="end" />
                     </LinearLayout>
 
+                    <!-- Données agricoles -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:layout_marginBottom="12dp">
+                        <TextView android:id="@+id/tv_precipitation"
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textColor="@android:color/white" android:alpha="0.9" />
+                        <TextView android:id="@+id/tv_et0"
+                            android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textColor="@android:color/white" android:alpha="0.9"
+                            android:gravity="end" />
+                    </LinearLayout>
+
+                    <!-- Conseil semis -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp" app:cardCornerRadius="12dp"
-                        app:cardBackgroundColor="#20FFFFFF" app:cardElevation="0dp">
+                        android:layout_marginBottom="8dp" app:cardCornerRadius="12dp"
+                        app:cardBackgroundColor="#25000000" app:cardElevation="0dp">
                         <TextView android:id="@+id/tv_sowing_advice"
                             android:layout_width="match_parent" android:layout_height="wrap_content"
                             android:padding="12dp" android:textColor="@android:color/white"
-                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                            android:text="✅ Conditions idéales pour semer" />
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Conseil arrosage -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        app:cardCornerRadius="12dp" app:cardBackgroundColor="#25000000"
+                        app:cardElevation="0dp">
+                        <TextView android:id="@+id/tv_irrigation_advice"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:padding="12dp" android:textColor="@android:color/white"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.button.MaterialButton
@@ -168,44 +152,51 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Suivi de croissance -->
-            <LinearLayout android:id="@+id/growth_container" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:orientation="vertical"
-                android:visibility="gone">
+            <!-- Source données -->
+            <TextView android:id="@+id/tv_data_source"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Données : Open-Meteo.com (météo agricole gratuite)"
+                android:textSize="11sp" android:alpha="0.5"
+                android:visibility="gone" />
 
-                <TextView android:id="@+id/tv_upcoming_title" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:layout_marginBottom="8dp"
-                    android:text="🔔 Récoltes dans les 30 jours"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            <!-- Récoltes imminentes -->
+            <TextView android:id="@+id/tv_upcoming_title"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp" android:text="🔔 Récoltes dans les 30 jours"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:visibility="gone" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" app:cardCornerRadius="16dp">
+                <TextView android:id="@+id/tv_upcoming_harvests"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:padding="16dp" android:lineSpacingExtra="6dp"
                     android:visibility="gone" />
+            </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.card.MaterialCardView android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="16dp">
-                    <TextView android:id="@+id/tv_upcoming_harvests" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:padding="16dp"
-                        android:lineSpacingExtra="6dp" android:visibility="gone" />
-                </com.google.android.material.card.MaterialCardView>
-
+            <!-- Stats -->
+            <LinearLayout android:id="@+id/growth_container"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:visibility="gone">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp" android:text="📊 Tableau de bord"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
-
-                <com.google.android.material.card.MaterialCardView android:layout_width="match_parent"
-                    android:layout_height="wrap_content" app:cardCornerRadius="16dp">
-                    <TextView android:id="@+id/tv_stats_growth" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:padding="16dp"
-                        android:lineSpacingExtra="8dp"
-                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:text="Aucun semis actif" />
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp">
+                    <TextView android:id="@+id/tv_stats_growth"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:padding="16dp" android:lineSpacingExtra="8dp"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
                 </com.google.android.material.card.MaterialCardView>
-
             </LinearLayout>
 
-            <!-- Vue vide croissance -->
-            <LinearLayout android:id="@+id/empty_growth" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:orientation="vertical"
-                android:gravity="center" android:padding="32dp" android:visibility="gone">
+            <LinearLayout android:id="@+id/empty_growth"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:gravity="center"
+                android:padding="32dp" android:visibility="gone">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:text="🌿" android:textSize="48sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"

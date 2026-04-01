@@ -18,8 +18,7 @@ class AddEditPlantDialog : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: SemisViewModel by lazy {
-        ViewModelProvider(
-            requireActivity(),
+        ViewModelProvider(requireActivity(),
             ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
         )[SemisViewModel::class.java]
     }
@@ -31,8 +30,8 @@ class AddEditPlantDialog : BottomSheetDialogFragment() {
             "Légume", "Légume fruit", "Légume racine", "Légume feuille",
             "Légumineuse", "Aromate", "Bulbe", "Tubercule", "Fleur", "Autre"
         )
-        val SUN_OPTIONS = listOf("☀️ Plein soleil", "⛅ Mi-ombre", "🌑 Ombre")
-        val WATER_OPTIONS = listOf("💧 Faible", "💧💧 Moyen", "💧💧💧 Élevé")
+        val SUN_OPTIONS = listOf("Plein soleil", "Mi-ombre", "Ombre")
+        val WATER_OPTIONS = listOf("Faible", "Moyen", "Élevé")
 
         fun newInstance(plant: Plant) = AddEditPlantDialog().apply { existingPlant = plant }
     }
@@ -45,17 +44,17 @@ class AddEditPlantDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Remplir les dropdowns
         val catAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, CATEGORIES)
         binding.spinnerCategory.setAdapter(catAdapter)
 
-        val sunAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, SUN_OPTIONS)
+        val sunLabels = listOf("☀️ Plein soleil", "⛅ Mi-ombre", "🌑 Ombre")
+        val sunAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, sunLabels)
         binding.spinnerSun.setAdapter(sunAdapter)
 
-        val waterAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, WATER_OPTIONS)
+        val waterLabels = listOf("💧 Faible", "💧💧 Moyen", "💧💧💧 Élevé")
+        val waterAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, waterLabels)
         binding.spinnerWater.setAdapter(waterAdapter)
 
-        // Remplir le formulaire si modification
         existingPlant?.let { p ->
             binding.tvDialogTitle.text = "✏️ Modifier ${p.name}"
             binding.etName.setText(p.name)
@@ -66,30 +65,32 @@ class AddEditPlantDialog : BottomSheetDialogFragment() {
             binding.etOccupationDays.setText(p.occupationDays.toString())
             binding.etSpacingCm.setText(p.spacingCm.toString())
             binding.etGerminationDays.setText(p.germinationDays.toString())
-            // Matcher l'exposition et l'eau avec les options du dropdown
-            val sunMatch = SUN_OPTIONS.firstOrNull { it.contains(p.sunExposure, ignoreCase = true) } ?: SUN_OPTIONS[0]
-            binding.spinnerSun.setText(sunMatch, false)
-            val waterMatch = WATER_OPTIONS.firstOrNull { it.contains(p.waterNeeds, ignoreCase = true) } ?: WATER_OPTIONS[1]
-            binding.spinnerWater.setText(waterMatch, false)
+            // Trouver le label correspondant à l'exposition stockée
+            val sunIdx = SUN_OPTIONS.indexOfFirst { p.sunExposure.contains(it, true) }.coerceAtLeast(0)
+            binding.spinnerSun.setText(sunLabels[sunIdx], false)
+            val waterIdx = WATER_OPTIONS.indexOfFirst { p.waterNeeds.contains(it, true) }.coerceAtLeast(1)
+            binding.spinnerWater.setText(waterLabels[waterIdx], false)
             binding.etNotes.setText(p.notes)
-            // Bouton supprimer visible seulement en mode édition
             binding.btnDeletePlant.visibility = View.VISIBLE
         } ?: run {
             binding.tvDialogTitle.text = "🌱 Nouvelle plante"
-            // Valeurs par défaut
             binding.spinnerCategory.setText(CATEGORIES[0], false)
-            binding.spinnerSun.setText(SUN_OPTIONS[0], false)
-            binding.spinnerWater.setText(WATER_OPTIONS[1], false)
+            binding.spinnerSun.setText(sunLabels[0], false)
+            binding.spinnerWater.setText(waterLabels[1], false)
         }
 
         binding.btnDeletePlant.setOnClickListener {
             val plant = existingPlant ?: return@setOnClickListener
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Supprimer ${plant.name} ?")
-                .setMessage("Cette plante sera définitivement retirée de la bibliothèque.")
+                .setMessage("Cette plante sera retirée de la bibliothèque.")
                 .setPositiveButton("Supprimer") { _, _ ->
-                    viewModel.deletePlant(plant)
-                    if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+                    viewModel.deletePlant(plant) {
+                        // dismiss dans le callback, sur le main thread
+                        activity?.runOnUiThread {
+                            if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+                        }
+                    }
                 }
                 .setNegativeButton("Annuler", null)
                 .show()
@@ -100,14 +101,16 @@ class AddEditPlantDialog : BottomSheetDialogFragment() {
             if (name.isEmpty()) { binding.tilName.error = "Le nom est requis"; return@setOnClickListener }
             binding.tilName.error = null
 
-            // Extraire l'exposition et l'eau depuis les dropdowns (retirer l'emoji)
-            val sunRaw = binding.spinnerSun.text?.toString() ?: SUN_OPTIONS[0]
+            // Désactiver le bouton pendant l'opération
+            binding.btnSave.isEnabled = false
+
+            val sunRaw = binding.spinnerSun.text?.toString() ?: ""
             val sunExposure = when {
                 sunRaw.contains("Plein soleil") -> "Plein soleil"
                 sunRaw.contains("Mi-ombre") -> "Mi-ombre"
                 else -> "Ombre"
             }
-            val waterRaw = binding.spinnerWater.text?.toString() ?: WATER_OPTIONS[1]
+            val waterRaw = binding.spinnerWater.text?.toString() ?: ""
             val waterNeeds = when {
                 waterRaw.contains("Élevé") -> "Élevé"
                 waterRaw.contains("Faible") -> "Faible"
@@ -130,11 +133,23 @@ class AddEditPlantDialog : BottomSheetDialogFragment() {
                 isDefault = existingPlant?.isDefault ?: false
             )
 
-            if (existingPlant != null) viewModel.updatePlant(plant) else viewModel.addPlant(plant)
-            if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+            val onDone = { success: Boolean ->
+                activity?.runOnUiThread {
+                    if (success) {
+                        if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+                    } else {
+                        _binding?.btnSave?.isEnabled = true
+                    }
+                }
+            }
+
+            if (existingPlant != null) viewModel.updatePlant(plant, onDone)
+            else viewModel.addPlant(plant, onDone)
         }
 
-        binding.btnCancel.setOnClickListener { if (isAdded && !isStateSaved) dismissAllowingStateLoss() }
+        binding.btnCancel.setOnClickListener {
+            if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+        }
     }
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }

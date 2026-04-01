@@ -92,11 +92,20 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
             val plant = plantList.firstOrNull { "${it.emoji} ${it.name}" == plantName }
             if (plant == null) { binding.tilPlant.error = "Choisissez une plante"; return@setOnClickListener }
             binding.tilPlant.error = null
+            binding.btnConfirm.isEnabled = false
             viewModel.addSowing(plant.id, selectedDate,
                 binding.etLocation.text?.toString()?.trim() ?: "",
                 binding.etQuantity.text?.toString()?.toIntOrNull() ?: 1,
-                binding.etNotes.text?.toString()?.trim() ?: "")
-            if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+                binding.etNotes.text?.toString()?.trim() ?: ""
+            ) { success ->
+                activity?.runOnUiThread {
+                    if (success) {
+                        if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+                    } else {
+                        _binding?.btnConfirm?.isEnabled = true
+                    }
+                }
+            }
         }
 
         binding.btnCancel.setOnClickListener { if (isAdded && !isStateSaved) dismissAllowingStateLoss() }

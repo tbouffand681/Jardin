@@ -153,8 +153,11 @@ class AddEventBottomSheet : BottomSheetDialogFragment() {
                 location = binding.etLocation.text?.toString()?.trim() ?: ""
             )
 
-            viewModel.addNaturalEvent(event)
-            if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+            viewModel.addNaturalEvent(event) {
+                activity?.runOnUiThread {
+                    if (isAdded && !isStateSaved) dismissAllowingStateLoss()
+                }
+            }
         }
 
         binding.btnCancel.setOnClickListener { if (isAdded && !isStateSaved) dismissAllowingStateLoss() }

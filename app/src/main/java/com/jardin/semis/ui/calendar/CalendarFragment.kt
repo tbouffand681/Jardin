@@ -113,7 +113,7 @@ class CalendarFragment : Fragment() {
     }
 
     private fun showStatusDialog(sowingId: Long, currentStatus: SowingStatus) {
-        val labels = arrayOf("🌰 Semé", "🌱 Levée observée", "🌿 En croissance", "✅ Récolté", "❌ Échec")
+        val labels = arrayOf("🌰 Semé", "🌱 Levée observée", "🪴 Repiqué", "🌿 En croissance", "✅ Récolté", "❌ Échec")
         val statuses = SowingStatus.values()
         val currentIdx = statuses.indexOf(currentStatus).coerceAtLeast(0)
 
