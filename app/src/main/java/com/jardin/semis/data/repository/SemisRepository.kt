@@ -125,7 +125,7 @@ class SemisRepository(
                 waterNeeds = "Moyen", germinationDays = 14, germinationTempMin = 8,
                 germinationTempMax = 20, isDefault = true,
                 notes = "Ameublir le sol en profondeur. Éclaircir à 5 cm."),
-            Plant(name = "Laitue", latinName = "Lactuca sativa", category = "Salade",
+            Plant(name = "Laitue", latinName = "Lactuca sativa", category = "Légume feuille",
                 emoji = "🥬", sowingMonths = "2,3,4,5,6,7,8", occupationDays = 60,
                 sowingDepthCm = 0.5f, spacingCm = 25, sunExposure = "Mi-ombre",
                 waterNeeds = "Moyen", germinationDays = 5, germinationTempMin = 10,

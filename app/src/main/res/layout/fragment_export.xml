@@ -64,6 +64,20 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+
+            <!-- Import JSON -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_import"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="📥 Importer une sauvegarde (JSON)"
+                app:icon="@drawable/ic_refresh"
+                app:cornerRadius="12dp"
+                android:backgroundTint="#E8F5E9"
+                android:textColor="@color/green_primary"
+                style="@style/Widget.Material3.Button.OutlinedButton" />
+
             <!-- Sauvegarde complète -->
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="💾 Sauvegarde complète"

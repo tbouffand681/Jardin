@@ -12,8 +12,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.jardin.semis.SemisViewModel
 import com.jardin.semis.data.model.Plant
 import com.jardin.semis.databinding.BottomSheetAddSowingBinding
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -35,10 +35,16 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
     private var plantList: List<Plant> = emptyList()
     private val displayFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.FRENCH)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    // Plante pré-sélectionnée (quand on vient de la fiche plante)
+    var preselectedPlantId: Long = -1L
+
+    companion object {
+        fun newInstanceWithPlant(plantId: Long) = AddSowingBottomSheet().apply {
+            preselectedPlantId = plantId
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = BottomSheetAddSowingBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -48,32 +54,34 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
 
         binding.tvSelectedDate.text = selectedDate.format(displayFormatter)
 
-        // Charger les plantes une seule fois avec .first() — pas de collectLatest qui reste ouvert
         lifecycleScope.launch {
             try {
                 val plants = viewModel.allPlants.first { it.isNotEmpty() }
                 plantList = plants
                 val names = plants.map { "${it.emoji} ${it.name}" }
-                val adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    names
-                )
-                if (_binding != null) {
-                    binding.spinnerPlant.setAdapter(adapter)
-                    binding.spinnerPlant.setOnItemClickListener { _, _, position, _ ->
-                        if (position < plants.size) updateHarvestPreview(plants[position])
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, names)
+                if (_binding == null) return@launch
+                binding.spinnerPlant.setAdapter(adapter)
+
+                // Pré-sélectionner la plante si demandé
+                if (preselectedPlantId > 0) {
+                    val preselected = plants.firstOrNull { it.id == preselectedPlantId }
+                    if (preselected != null) {
+                        binding.spinnerPlant.setText("${preselected.emoji} ${preselected.name}", false)
+                        updateHarvestPreview(preselected)
                     }
                 }
-            } catch (e: Exception) {
-                // Ignorer si le fragment est déjà détaché
-            }
+
+                binding.spinnerPlant.setOnItemClickListener { _, _, position, _ ->
+                    if (position < plants.size) updateHarvestPreview(plants[position])
+                }
+            } catch (e: Exception) { /* liste vide */ }
         }
 
         binding.btnPickDate.setOnClickListener {
             val cal = Calendar.getInstance()
-            DatePickerDialog(requireContext(), { _, year, month, day ->
-                selectedDate = LocalDate.of(year, month + 1, day)
+            DatePickerDialog(requireContext(), { _, y, m, d ->
+                selectedDate = LocalDate.of(y, m + 1, d)
                 binding.tvSelectedDate.text = selectedDate.format(displayFormatter)
                 updateHarvestPreview()
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
@@ -82,36 +90,21 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
         binding.btnConfirm.setOnClickListener {
             val plantName = binding.spinnerPlant.text?.toString() ?: ""
             val plant = plantList.firstOrNull { "${it.emoji} ${it.name}" == plantName }
-
-            if (plant == null) {
-                binding.tilPlant.error = "Choisissez une plante dans la liste"
-                return@setOnClickListener
-            }
+            if (plant == null) { binding.tilPlant.error = "Choisissez une plante"; return@setOnClickListener }
             binding.tilPlant.error = null
-
-            val location = binding.etLocation.text?.toString()?.trim() ?: ""
-            val quantity = binding.etQuantity.text?.toString()?.toIntOrNull() ?: 1
-            val notes = binding.etNotes.text?.toString()?.trim() ?: ""
-
-            // Lancer addSowing PUIS fermer — sans attendre le résultat pour éviter le crash
-            viewModel.addSowing(plant.id, selectedDate, location, quantity, notes)
-
-            // Fermer seulement si le fragment est encore attaché
-            if (isAdded && !isStateSaved) {
-                dismissAllowingStateLoss()
-            }
-        }
-
-        binding.btnCancel.setOnClickListener {
+            viewModel.addSowing(plant.id, selectedDate,
+                binding.etLocation.text?.toString()?.trim() ?: "",
+                binding.etQuantity.text?.toString()?.toIntOrNull() ?: 1,
+                binding.etNotes.text?.toString()?.trim() ?: "")
             if (isAdded && !isStateSaved) dismissAllowingStateLoss()
         }
+
+        binding.btnCancel.setOnClickListener { if (isAdded && !isStateSaved) dismissAllowingStateLoss() }
     }
 
     private fun updateHarvestPreview(plant: Plant? = null) {
         if (_binding == null) return
-        val p = plant ?: plantList.firstOrNull {
-            "${it.emoji} ${it.name}" == binding.spinnerPlant.text?.toString()
-        }
+        val p = plant ?: plantList.firstOrNull { "${it.emoji} ${it.name}" == binding.spinnerPlant.text?.toString() }
         p?.let {
             val harvest = selectedDate.plusDays(it.occupationDays.toLong())
             binding.tvHarvestPreview.text = "📅 Récolte estimée : ${harvest.format(displayFormatter)}"
@@ -121,8 +114,5 @@ class AddSowingBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
