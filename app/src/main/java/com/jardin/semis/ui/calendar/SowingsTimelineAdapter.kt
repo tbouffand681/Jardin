@@ -76,6 +76,7 @@ class SowingsTimelineAdapter(
                 val statusColor = when (sowing.status) {
                     SowingStatus.SOWED -> R.color.status_sowed
                     SowingStatus.GERMINATED -> R.color.status_germinated
+                    SowingStatus.TRANSPLANTED -> R.color.status_germinated
                     SowingStatus.GROWING -> R.color.status_growing
                     SowingStatus.HARVESTED -> R.color.status_harvested
                     SowingStatus.FAILED -> R.color.status_failed

@@ -133,7 +133,7 @@ class AddEditPlantDialog : BottomSheetDialogFragment() {
                 isDefault = existingPlant?.isDefault ?: false
             )
 
-            val onDone = { success: Boolean ->
+            val onDone: (Boolean) -> Unit = { success ->
                 activity?.runOnUiThread {
                     if (success) {
                         if (isAdded && !isStateSaved) dismissAllowingStateLoss()
