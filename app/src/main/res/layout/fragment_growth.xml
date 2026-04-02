@@ -160,6 +160,79 @@
                 android:textSize="11sp" android:alpha="0.5"
                 android:visibility="gone" />
 
+
+            <!-- Bloc ET₀ cumulée -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_et0_cumul"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="🌱 Besoins en eau prévisionnels"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleSmall" />
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:layout_marginBottom="4dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Aujourd'hui"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:alpha="0.6" />
+                        <TextView android:id="@+id/tv_et0_today"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textStyle="bold" android:text="— L/m²" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:layout_marginBottom="4dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Cumul 2 jours"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:alpha="0.6" />
+                        <TextView android:id="@+id/tv_et0_2days"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textStyle="bold" android:text="— L/m²" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Cumul 5 jours"
+                            android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                            android:alpha="0.6" />
+                        <TextView android:id="@+id/tv_et0_5days"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textStyle="bold" android:text="— L/m²" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="ET₀ = évapotranspiration de référence FAO-56 (mm = L/m²)"
+                        android:textSize="11sp"
+                        android:alpha="0.5" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Récoltes imminentes -->
             <TextView android:id="@+id/tv_upcoming_title"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
