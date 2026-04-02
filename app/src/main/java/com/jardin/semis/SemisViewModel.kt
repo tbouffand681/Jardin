@@ -103,6 +103,11 @@ class SemisViewModel(application: Application) : AndroidViewModel(application) {
         })
     }
 
+    fun deleteSowingById(id: Long) = viewModelScope.launch {
+        repository.deleteSowingById(id)
+        _message.postValue("Semis supprimé")
+    }
+
     fun deleteSowing(sowing: Sowing) = viewModelScope.launch {
         repository.deleteSowing(sowing)
         _message.postValue("Semis supprimé")
