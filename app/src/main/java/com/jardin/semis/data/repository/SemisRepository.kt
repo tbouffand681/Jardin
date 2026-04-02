@@ -62,6 +62,7 @@ class SemisRepository(
         sowingDao.updateSowingStatus(id, status)
 
     suspend fun deleteSowing(sowing: Sowing) = sowingDao.deleteSowing(sowing)
+    suspend fun deleteSowingById(id: Long) = sowingDao.deleteSowingById(id)
 
     // ─── Journal naturel ──────────────────────────────────────────────────────
 
