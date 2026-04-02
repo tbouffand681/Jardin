@@ -63,7 +63,10 @@ class ExportFragment : Fragment() {
     }
 
     private fun openFilePicker() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT).apply { type = "application/json" }
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/json", "text/plain", "text/x-json"))
+        }
         importLauncher.launch(Intent.createChooser(intent, "Choisir la sauvegarde JSON"))
     }
 
@@ -115,7 +118,17 @@ class ExportFragment : Fragment() {
                     }
                 }
 
-                showMessage("✅ Importé : $plantsImported plante(s), $eventsImported observation(s)")
+                val msg = buildString {
+                    append("✅ Import réussi !")
+                    if (plantsImported > 0) append(" $plantsImported plante(s)")
+                    if (eventsImported > 0) append(", $eventsImported observation(s)")
+                    if (plantsImported == 0 && eventsImported == 0) append(" — Aucune donnée importée (vérifiez le fichier)")
+                }
+                if (_binding != null) {
+                    com.google.android.material.snackbar.Snackbar
+                        .make(binding.root, msg, com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+                        .show()
+                }
             } catch (e: Exception) {
                 showMessage("❌ Erreur d'import : ${e.message}")
             }
